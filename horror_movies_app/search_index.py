@@ -64,13 +64,10 @@ class SearchIndex:
     def __init__(self):
         self.date_index = SkipList()
         self.rating_index = SkipList()
-
     def build_indexes(self, movies: Dict[int, Dict[str, Any]]):
-        print("Строим поисковые индексы...")
 
         for movie_id, movie in movies.items():
             if movie['release_date']:
                 self.date_index.insert(movie['release_date'], movie_id)
             self.rating_index.insert(movie['vote_average'], movie_id)
 
-        print("Индексы построены!")

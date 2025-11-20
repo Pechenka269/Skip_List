@@ -8,8 +8,6 @@ class DataLoader:
         self.movies: Dict[int, Dict[str, Any]] = {}
 
     def load_from_csv(self, filename: str) -> Dict[int, Dict[str, Any]]:
-        print("Загружаем данные о фильмах...")
-
         try:
             with open(filename, 'r', encoding='utf-8') as file:
                 reader = csv.DictReader(file)
@@ -37,8 +35,6 @@ class DataLoader:
 
                     except (ValueError, KeyError):
                         continue
-
-                print(f"Успешно загружено {movies_loaded} фильмов")
                 return self.movies
 
         except FileNotFoundError:
