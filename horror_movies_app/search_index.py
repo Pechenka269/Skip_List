@@ -1,5 +1,6 @@
 import random
-from typing import Any, List, Dict
+from typing import Any, List, Optional, Dict
+from datetime import datetime
 
 
 class SkipListNode:
@@ -62,12 +63,35 @@ class SkipList:
 
 class SearchIndex:
     def __init__(self):
-        self.date_index = SkipList()
-        self.rating_index = SkipList()
+        self.release_date_index = SkipList()
+        self.vote_average_index = SkipList()
+
     def build_indexes(self, movies: Dict[int, Dict[str, Any]]):
 
         for movie_id, movie in movies.items():
             if movie['release_date']:
-                self.date_index.insert(movie['release_date'], movie_id)
-            self.rating_index.insert(movie['vote_average'], movie_id)
+                self.release_date_index.insert(movie['release_date'], movie_id)
+            self.vote_average_index.insert(movie['vote_average'], movie_id)
 
+    def search_combined(self, start_date: Optional[datetime], end_date: Optional[datetime],
+                        min_rating: Optional[float], max_rating: Optional[float],
+                        movies: Dict[int, Dict[str, Any]]) -> List[Dict[str, Any]]:
+        date_ids = set()
+        rating_ids = set()
+
+        if start_date and end_date:
+            date_ids = set(self.release_date_index.search_range(start_date, end_date))
+
+        if min_rating is not None and max_rating is not None:
+            rating_ids = set(self.vote_average_index.search_range(min_rating, max_rating))
+
+        if date_ids and rating_ids:
+            final_ids = date_ids.intersection(rating_ids)
+        elif date_ids:
+            final_ids = date_ids
+        elif rating_ids:
+            final_ids = rating_ids
+        else:
+            return []
+
+        return [movies[movie_id] for movie_id in final_ids]
